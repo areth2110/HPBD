@@ -1,217 +1,192 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>🎂 Happy Birthday</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>🎉 Chúc Mừng Sinh Nhật 🎂</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-<style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', sans-serif;
-}
+    body {
+      height: 100vh;
+      background: linear-gradient(270deg, #ff6ec4, #7873f5, #4facfe);
+      background-size: 600% 600%;
+      animation: bgMove 12s ease infinite;
+      overflow: hidden;
+      color: white;
+      text-align: center;
+    }
 
-body {
-  height: 100vh;
-  background: radial-gradient(circle at top, #ff9a9e, #fad0c4);
-  overflow: hidden;
-  color: white;
-  text-align: center;
-}
+    @keyframes bgMove {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
 
-.container {
-  position: absolute;
-  width: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-}
+    .container {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 20px;
+    }
 
-h1 {
-  font-size: 2.8rem;
-  margin-bottom: 10px;
-}
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      text-shadow: 0 0 15px rgba(255,255,255,0.8);
+    }
 
-p {
-  font-size: 1.2rem;
-}
+    p {
+      font-size: 1.4rem;
+      min-height: 60px;
+    }
 
-.cake {
-  position: relative;
-  margin: 30px auto;
-  width: 200px;
-  height: 140px;
-  background: #ffb6c1;
-  border-radius: 10px;
-}
+    .typing::after {
+      content: '|';
+      animation: blink 1s infinite;
+    }
 
-.candle {
-  position: absolute;
-  width: 10px;
-  height: 40px;
-  background: white;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-}
+    @keyframes blink {
+      0%,50% {opacity: 1;}
+      51%,100% {opacity: 0;}
+    }
 
-.flame {
-  position: absolute;
-  top: -25px;
-  left: 50%;
-  width: 16px;
-  height: 25px;
-  background: radial-gradient(circle, #fff700, #ff8c00);
-  border-radius: 50%;
-  transform: translateX(-50%);
-  animation: flicker 0.2s infinite;
-}
+    .heart, .star {
+      position: absolute;
+      font-size: 20px;
+      animation: floatUp 6s linear infinite;
+      opacity: 0.8;
+    }
 
-@keyframes flicker {
-  50% { transform: translateX(-50%) scale(0.9); }
-}
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) scale(0.8);
+        opacity: 0;
+      }
+      20% {opacity: 1;}
+      100% {
+        transform: translateY(-10vh) scale(1.5);
+        opacity: 0;
+      }
+    }
 
-.heart-container {
-  display: none;
-  position: fixed;
-  inset: 0;
-}
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
 
-.heart {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  font-size: 90px;
-  transform: translate(-50%, -50%);
-  animation: beat 1s infinite;
-}
-
-@keyframes beat {
-  50% { transform: translate(-50%, -50%) scale(1.2); }
-}
-
-.circle-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 300px;
-  height: 300px;
-  transform: translate(-50%, -50%);
-  animation: rotate 12s linear infinite;
-}
-
-@keyframes rotate {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-.circle-text span {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform-origin: 0 150px;
-  font-size: 18px;
-}
-
-.sparkle {
-  position: absolute;
-  font-size: 20px;
-  animation: float 4s linear infinite;
-}
-
-@keyframes float {
-  from { opacity: 0; transform: translateY(50px); }
-  to { opacity: 0; transform: translateY(-100px); }
-}
-</style>
+    footer {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  </style>
 </head>
 
 <body>
+  <canvas id="fireworks"></canvas>
 
-<div class="container" id="stage1">
-  <h1>🎉 Chúc Mừng Sinh Nhật</h1>
-  <p id="info"></p>
-
-  <div class="cake">
-    <div class="candle">
-      <div class="flame" id="flame"></div>
-    </div>
+  <div class="container">
+    <h1>🎂 Chúc Mừng Sinh Nhật 🎉</h1>
+    <p id="text" class="typing"></p>
   </div>
 
-  <p>👉 Nhấn nút & thổi vào micro 🎤</p>
-  <button id="startMic">🎤 Bắt đầu thổi nến</button>
-</div>
+  <footer>
+    💖 Một ngày thật rực rỡ & đầy yêu thương 💖
+  </footer>
 
-<div class="heart-container" id="stage2">
-  <div class="heart">💖</div>
-  <div class="circle-text" id="circleText"></div>
-</div>
+  <script>
+    /* ===== Typing Effect ===== */
+    const message = "Chúc bạn tuổi mới luôn mạnh khỏe, hạnh phúc, đạt được mọi ước mơ và luôn mỉm cười thật tươi 🌟💖";
+    let i = 0;
+    const speed = 60;
+    const textEl = document.getElementById("text");
 
-<script>
-const name = "Vic Ven";
-const birthday = "04/01/2004";
-const wish = "Chúc mừng sinh nhật 🎂 Luôn hạnh phúc – mạnh khỏe – và được yêu thương 💖 ";
+    function typeText() {
+      if (i < message.length) {
+        textEl.innerHTML += message.charAt(i);
+        i++;
+        setTimeout(typeText, speed);
+      }
+    }
+    typeText();
 
-document.getElementById("info").innerText =🎂 ${name} | 🎈 ${birthday}`;
+    /* ===== Floating Hearts & Stars ===== */
+    function createFloating(symbol, className) {
+      const el = document.createElement("div");
+      el.className = className;
+      el.innerHTML = symbol;
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.animationDuration = 4 + Math.random() * 4 + "s";
+      document.body.appendChild(el);
 
-let audioContext, analyser, microphone, dataArray;
-const flame = document.getElementById("flame");
+      setTimeout(() => el.remove(), 8000);
+    }
 
-document.getElementById("startMic").addEventListener("click", async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    setInterval(() => createFloating("💖", "heart"), 600);
+    setInterval(() => createFloating("⭐", "star"), 900);
 
-    audioContext = new AudioContext();
-    analyser = audioContext.createAnalyser();
-    microphone = audioContext.createMediaStreamSource(stream);
+    /* ===== Fireworks Effect ===== */
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    microphone.connect(analyser);
-    analyser.fftSize = 256;
-    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    let particles = [];
 
-    listen();
-  } catch {
-    alert("⚠️ Không truy cập được micro");
-  }
-});
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
 
-function listen() {
-  analyser.getByteFrequencyData(dataArray);
-  const volume = dataArray.reduce((a,b)=>a+b)/dataArray.length;
-  if (volume > 40) blowOut();
-  else requestAnimationFrame(listen);
-}
+    function createFirework(x, y) {
+      for (let i = 0; i < 40; i++) {
+        particles.push({
+          x,
+          y,
+          angle: random(0, Math.PI * 2),
+          speed: random(2, 6),
+          radius: random(1, 3),
+          life: 100,
+        });
+      }
+    }
 
-function blowOut() {
-  flame.style.display = "none";
-  stage1.style.display = "none";
-  stage2.style.display = "block";
-  createCircleText();
-  sparkle();
-}
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, index) => {
+        p.x += Math.cos(p.angle) * p.speed;
+        p.y += Math.sin(p.angle) * p.speed;
+        p.life--;
 
-function createCircleText() {
-  const circle = document.getElementById("circleText");
-  [...wish].forEach((c,i)=>{
-    const span=document.createElement("span");
-    span.innerText=c;
-    span.style.transform=`rotate(${i*8}deg)`;
-    circle.appendChild(span);
-  });
-}
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.😎";
+        ctx.fill();
 
-function sparkle() {
-  setInterval(()=>{
-    const s=document.createElement("div");
-    s.className="sparkle";
-    s.innerText="✨";
-    s.style.left=Math.random()*100+"vw";
-    s.style.top=Math.random()*100+"vh";
-    document.body.appendChild(s);
-    setTimeout(()=>s.remove(),4000);
-  },300);
-}
-</script>
+        if (p.life <= 0) particles.splice(index, 1);
+      });
+      requestAnimationFrame(animate);
+    }
 
+    setInterval(() => {
+      createFirework(random(100, canvas.width - 100), random(100, canvas.height - 200));
+    }, 800);
+
+    animate();
+
+    window.onresize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+  </script>
 </body>
 </html>
