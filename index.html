@@ -2,164 +2,128 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>💖 Chúc Mừng Sinh Nhật 💖</title>
+<title>💖 Heart Particle Animation</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at top, #050505, #000000);
+    overflow: hidden;
+  }
 
-body {
-  height: 100vh;
-  background: radial-gradient(circle at top, #ff9a9e, #fad0c4, #fbc2eb);
-  overflow: hidden;
-  color: white;
-}
-
-/* ✨ Sparkle background */
-.sparkle {
-  position: absolute;
-  font-size: 18px;
-  animation: sparkle 4s linear infinite;
-  opacity: 0.8;
-}
-
-@keyframes sparkle {
-  0% { transform: translateY(50px); opacity: 0; }
-  20% { opacity: 1; }
-  100% { transform: translateY(-120px); opacity: 0; }
-}
-
-/* 🎁 Center */
-.container {
-  position: absolute;
-  width: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  text-align: center;
-}
-
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 8px;
-  text-shadow: 0 0 15px rgba(255,255,255,0.9);
-}
-
-p {
-  font-size: 1.1rem;
-  opacity: 0.9;
-}
-
-/* 💖 Heart */
-.heart {
-  position: relative;
-  margin: 40px auto;
-  font-size: 100px;
-  animation: beat 1s infinite;
-  text-shadow: 0 0 25px rgba(255,255,255,0.9);
-}
-
-@keyframes beat {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.25); }
-  100% { transform: scale(1); }
-}
-
-/* 💫 Rotating text */
-.circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 320px;
-  height: 320px;
-  transform: translate(-50%, -50%);
-  animation: rotate 14s linear infinite;
-}
-
-@keyframes rotate {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-.circle span {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform-origin: 0 160px;
-  font-size: 18px;
-  white-space: pre;
-}
-
-/* 👣 Footer */
-footer {
-  position: fixed;
-  bottom: 10px;
-  width: 100%;
-  text-align: center;
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
+  canvas {
+    display: block;
+  }
 </style>
 </head>
 
 <body>
-
-<div class="container">
-  <h1 id="title"></h1>
-  <p id="date"></p>
-
-  <div style="position:relative;">
-    <div class="heart">💖</div>
-    <div class="circle" id="circleText"></div>
-  </div>
-</div>
-
-<footer>
-  ✨ Một khoảnh khắc sinh nhật thật đặc biệt ✨
-</footer>
+<canvas id="canvas"></canvas>
 
 <script>
-/* 🎂 PERSONALIZE HERE */
-const name = "Kim Ngân";
-const birthday = "21/10/2004";
-const message =
-  " Chúc mừng sinh nhật 🎂 Chúc bạn luôn hạnh phúc – mạnh khỏe – bình an – và luôn được yêu thương 💖 ";
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-/* 👤 Show info */
-document.getElementById("title").innerText =
- 🎉 Chúc Mừng Sinh Nhật ${name}`;
-document.getElementById("date").innerText =
- 🎈 ${birthday}`;
+const cx = canvas.width / 2;
+const cy = canvas.height / 2 - 80;
 
-/* 💫 Create rotating text */
-const circle = document.getElementById("circleText");
-const chars = message.split("");
-const angle = 360 / chars.length;
+/* 🌸 Heart formula */
+function heart(t) {
+  return {
+    x: 16 * Math.pow(Math.sin(t), 3),
+    y: -(13 * Math.cos(t)
+       - 5 * Math.cos(2 * t)
+       - 2 * Math.cos(3 * t)
+       - Math.cos(4 * t))
+  };
+}
 
-chars.forEach((char, i) => {
-  const span = document.createElement("span");
-  span.innerText = char;
-  span.style.transform = rotate(${i * angle}deg);
-  circle.appendChild(span);
+/* 💖 Heart particles */
+let particles = [];
+const TOTAL = 2200;
+
+for (let i = 0; i < TOTAL; i++) {
+  const t = Math.random() * Math.PI * 2;
+  const h = heart(t);
+
+  particles.push({
+    angle: t,
+    x: h.x,
+    y: h.y,
+    z: Math.random() * 30,
+    size: Math.random() * 1.8 + 0.5,
+    speed: Math.random() * 0.02 + 0.01
+  });
+}
+
+/* 💫 Rotating text */
+const text = "Chúc mừng sinh nhật  •  Luôn hạnh phúc  •  Bình an  •  Được yêu thương  •  ";
+let textAngle = 0;
+
+/* 🎬 Animation */
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  /* ⭐ Background stars */
+  for (let i = 0; i < 60; i++) {
+    ctx.fillStyle = "rgba(255,255,255,0.15)";
+    ctx.fillRect(
+      Math.random() * canvas.width,
+      Math.random() * canvas.height,
+      1,
+      1
+    );
+  }
+
+  /* 💖 Heart */
+  particles.forEach(p => {
+    p.angle += p.speed;
+    const h = heart(p.angle);
+
+    const scale = 10;
+    const x = cx + h.x * scale + Math.sin(Date.now() * 0.002 + p.z) * 2;
+    const y = cy + h.y * scale + Math.cos(Date.now() * 0.002 + p.z) * 2;
+
+    ctx.beginPath();
+    ctx.arc(x, y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,120,160,0.85)";
+    ctx.fill();
+  });
+
+  /* 🔄 Circular rotating text */
+  const radius = 140;
+  textAngle += 0.002;
+
+  ctx.save();
+  ctx.translate(cx, cy + 160);
+  ctx.rotate(textAngle);
+
+  for (let i = 0; i < text.length; i++) {
+    const angle = (i / text.length) * Math.PI * 2;
+    ctx.save();
+    ctx.rotate(angle);
+    ctx.translate(0, -radius);
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.font = "16px Segoe UI";
+    ctx.fillText(text[i], 0, 0);
+    ctx.restore();
+  }
+
+  ctx.restore();
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+/* 📱 Resize */
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 });
-
-/* ✨ Sparkles */
-setInterval(() => {
-  const s = document.createElement("div");
-  s.className = "sparkle";
-  s.innerText = "✨";
-  s.style.left = Math.random() * 100 + "vw";
-  s.style.top = Math.random() * 100 + "vh";
-  s.style.animationDuration = 3 + Math.random() * 3 + "s";
-  document.body.appendChild(s);
-
-  setTimeout(() => s.remove(), 5000);
-}, 250);
 </script>
-
 </body>
 </html>
