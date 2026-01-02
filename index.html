@@ -1,159 +1,192 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>🎉 Happy Birthday 🎂</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>🎉 Chúc Mừng Sinh Nhật 🎂</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: radial-gradient(circle at top, #1a002a, #000);
-  font-family: 'Segoe UI', sans-serif;
-}
+    body {
+      height: 100vh;
+      background: linear-gradient(270deg, #ff6ec4, #7873f5, #4facfe);
+      background-size: 600% 600%;
+      animation: bgMove 12s ease infinite;
+      overflow: hidden;
+      color: white;
+      text-align: center;
+    }
 
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
+    @keyframes bgMove {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
 
-#overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-align: center;
-  pointer-events: none;
-}
+    .container {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 20px;
+    }
 
-h1 {
-  font-size: 4rem;
-  letter-spacing: 4px;
-  opacity: 0;
-  animation: fadeIn 3s ease forwards 2s;
-}
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      text-shadow: 0 0 15px rgba(255,255,255,0.8);
+    }
 
-p {
-  font-size: 1.4rem;
-  opacity: 0;
-  animation: fadeIn 3s ease forwards 4.5s;
-}
+    p {
+      font-size: 1.4rem;
+      min-height: 60px;
+    }
 
-@keyframes fadeIn {
-  to { opacity: 1; transform: translateY(0); }
-  from { opacity: 0; transform: translateY(20px); }
-}
+    .typing::after {
+      content: '|';
+      animation: blink 1s infinite;
+    }
 
-#hint {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  text-align: center;
-  color: rgba(255,255,255,0.6);
-  font-size: 0.9rem;
-}
-</style>
+    @keyframes blink {
+      0%,50% {opacity: 1;}
+      51%,100% {opacity: 0;}
+    }
+
+    .heart, .star {
+      position: absolute;
+      font-size: 20px;
+      animation: floatUp 6s linear infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) scale(0.8);
+        opacity: 0;
+      }
+      20% {opacity: 1;}
+      100% {
+        transform: translateY(-10vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  </style>
 </head>
 
 <body>
+  <canvas id="fireworks"></canvas>
 
-<canvas id="bg"></canvas>
-<canvas id="heart"></canvas>
+  <div class="container">
+    <h1>🎂 Chúc Mừng Sinh Nhật 🎉</h1>
+    <p id="text" class="typing"></p>
+  </div>
 
-<div id="overlay">
-  <h1>💖 HAPPY BIRTHDAY 💖</h1>
-  <p>Chúc bạn luôn rực rỡ, hạnh phúc  
-  <br>và được yêu thương theo cách đặc biệt nhất ✨</p>
-</div>
+  <footer>
+    💖 Một ngày thật rực rỡ & đầy yêu thương 💖
+  </footer>
 
-<div id="hint">🎧 Bật loa để cảm nhận trọn vẹn</div>
+  <script>
+    /* ===== Typing Effect ===== */
+    const message = "Chúc bạn tuổi mới luôn mạnh khỏe, hạnh phúc, đạt được mọi ước mơ và luôn mỉm cười thật tươi 🌟💖 Dù biết một năm qua có vui có buồn, nhưng mọi việc sẽ ổn thoi! Hi vọng tuổi mới sẽ ngày càng trưởng thành, gặp được người muốn gặp, đạt được những ước vọng mà cậu khao khát";
+    let i = 0;
+    const speed = 60;
+    const textEl = document.getElementById("text");
 
-<audio autoplay loop>
-  <source src="https://cdn.pixabay.com/audio/2023/03/13/audio_3e08b79fa8.mp3" type="audio/mpeg">
-</audio>
+    function typeText() {
+      if (i < message.length) {
+        textEl.innerHTML += message.charAt(i);
+        i++;
+        setTimeout(typeText, speed);
+      }
+    }
+    typeText();
 
-<script>
-/* ================= BACKGROUND PARTICLES ================= */
-const bg = document.getElementById("bg");
-const ctx = bg.getContext("2d");
-bg.width = innerWidth;
-bg.height = innerHeight;
+    /* ===== Floating Hearts & Stars ===== */
+    function createFloating(symbol, className) {
+      const el = document.createElement("div");
+      el.className = className;
+      el.innerHTML = symbol;
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.animationDuration = 4 + Math.random() * 4 + "s";
+      document.body.appendChild(el);
 
-let stars = Array.from({length: 150}, () => ({
-  x: Math.random()*bg.width,
-  y: Math.random()*bg.height,
-  r: Math.random()*2,
-  s: Math.random()*0.5 + 0.2
-}));
+      setTimeout(() => el.remove(), 8000);
+    }
 
-function drawBg(){
-  ctx.clearRect(0,0,bg.width,bg.height);
-  for(let s of stars){
-    ctx.beginPath();
-    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    ctx.fillStyle="rgba(255,255,255,0.😎";
-    ctx.fill();
-    s.y += s.s;
-    if(s.y > bg.height) s.y = 0;
-  }
-  requestAnimationFrame(drawBg);
-}
-drawBg();
+    setInterval(() => createFloating("💖", "heart"), 600);
+    setInterval(() => createFloating("⭐", "star"), 900);
 
-/* ================= HEART ANIMATION ================= */
-const hc = document.getElementById("heart");
-const hctx = hc.getContext("2d");
-hc.width = innerWidth;
-hc.height = innerHeight;
+    /* ===== Fireworks Effect ===== */
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-let t = 0;
+    let particles = [];
 
-function heart(t){
-  return {
-    x: 16 * Math.pow(Math.sin(t),3),
-    y: -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))
-  };
-}
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
 
-function drawHeart(){
-  hctx.clearRect(0,0,hc.width,hc.height);
-  hctx.save();
-  hctx.translate(hc.width/2, hc.height/2);
-  let scale = 12 + Math.sin(Date.now()/300)*1.2;
-  hctx.scale(scale, scale);
+    function createFirework(x, y) {
+      for (let i = 0; i < 40; i++) {
+        particles.push({
+          x,
+          y,
+          angle: random(0, Math.PI * 2),
+          speed: random(2, 6),
+          radius: random(1, 3),
+          life: 100,
+        });
+      }
+    }
 
-  hctx.beginPath();
-  for(let i=0;i<Math.PI*2;i+=0.02){
-    let p = heart(i);
-    hctx.lineTo(p.x,p.y);
-  }
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, index) => {
+        p.x += Math.cos(p.angle) * p.speed;
+        p.y += Math.sin(p.angle) * p.speed;
+        p.life--;
 
-  let gradient = hctx.createRadialGradient(0,-2,1,0,0,20);
-  gradient.addColorStop(0,"#ff9aa2");
-  gradient.addColorStop(1,"#ff005d");
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.😎";
+        ctx.fill();
 
-  hctx.fillStyle = gradient;
-  hctx.shadowColor = "#ff4d6d";
-  hctx.shadowBlur = 20;
-  hctx.fill();
-  hctx.restore();
+        if (p.life <= 0) particles.splice(index, 1);
+      });
+      requestAnimationFrame(animate);
+    }
 
-  requestAnimationFrame(drawHeart);
-}
-drawHeart();
+    setInterval(() => {
+      createFirework(random(100, canvas.width - 100), random(100, canvas.height - 200));
+    }, 800);
 
-/* ================= RESIZE ================= */
-window.onresize = ()=>{
-  bg.width = hc.width = innerWidth;
-  bg.height = hc.height = innerHeight;
-};
-</script>
+    animate();
 
+    window.onresize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+  </script>
 </body>
 </html>
