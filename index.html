@@ -1,192 +1,165 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>🎉 Chúc Mừng Sinh Nhật 🎂</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
+<meta charset="UTF-8">
+<title>💖 Chúc Mừng Sinh Nhật 💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    body {
-      height: 100vh;
-      background: linear-gradient(270deg, #ff6ec4, #7873f5, #4facfe);
-      background-size: 600% 600%;
-      animation: bgMove 12s ease infinite;
-      overflow: hidden;
-      color: white;
-      text-align: center;
-    }
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
 
-    @keyframes bgMove {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
+body {
+  height: 100vh;
+  background: radial-gradient(circle at top, #ff9a9e, #fad0c4, #fbc2eb);
+  overflow: hidden;
+  color: white;
+}
 
-    .container {
-      position: relative;
-      top: 50%;
-      transform: translateY(-50%);
-      padding: 20px;
-    }
+/* ✨ Sparkle background */
+.sparkle {
+  position: absolute;
+  font-size: 18px;
+  animation: sparkle 4s linear infinite;
+  opacity: 0.8;
+}
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 15px;
-      text-shadow: 0 0 15px rgba(255,255,255,0.8);
-    }
+@keyframes sparkle {
+  0% { transform: translateY(50px); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-120px); opacity: 0; }
+}
 
-    p {
-      font-size: 1.4rem;
-      min-height: 60px;
-    }
+/* 🎁 Center */
+.container {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+}
 
-    .typing::after {
-      content: '|';
-      animation: blink 1s infinite;
-    }
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  text-shadow: 0 0 15px rgba(255,255,255,0.9);
+}
 
-    @keyframes blink {
-      0%,50% {opacity: 1;}
-      51%,100% {opacity: 0;}
-    }
+p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
 
-    .heart, .star {
-      position: absolute;
-      font-size: 20px;
-      animation: floatUp 6s linear infinite;
-      opacity: 0.8;
-    }
+/* 💖 Heart */
+.heart {
+  position: relative;
+  margin: 40px auto;
+  font-size: 100px;
+  animation: beat 1s infinite;
+  text-shadow: 0 0 25px rgba(255,255,255,0.9);
+}
 
-    @keyframes floatUp {
-      0% {
-        transform: translateY(100vh) scale(0.8);
-        opacity: 0;
-      }
-      20% {opacity: 1;}
-      100% {
-        transform: translateY(-10vh) scale(1.5);
-        opacity: 0;
-      }
-    }
+@keyframes beat {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
 
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-    }
+/* 💫 Rotating text */
+.circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 320px;
+  height: 320px;
+  transform: translate(-50%, -50%);
+  animation: rotate 14s linear infinite;
+}
 
-    footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-  </style>
+@keyframes rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.circle span {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform-origin: 0 160px;
+  font-size: 18px;
+  white-space: pre;
+}
+
+/* 👣 Footer */
+footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+</style>
 </head>
 
 <body>
-  <canvas id="fireworks"></canvas>
 
-  <div class="container">
-    <h1>🎂 Chúc Mừng Sinh Nhật 🎉</h1>
-    <p id="text" class="typing"></p>
+<div class="container">
+  <h1 id="title"></h1>
+  <p id="date"></p>
+
+  <div style="position:relative;">
+    <div class="heart">💖</div>
+    <div class="circle" id="circleText"></div>
   </div>
+</div>
 
-  <footer>
-    💖 Một ngày thật rực rỡ & đầy yêu thương 💖
-  </footer>
+<footer>
+  ✨ Một khoảnh khắc sinh nhật thật đặc biệt ✨
+</footer>
 
-  <script>
-    /* ===== Typing Effect ===== */
-    const message = "Chúc bạn tuổi mới luôn mạnh khỏe, hạnh phúc, đạt được mọi ước mơ và luôn mỉm cười thật tươi 🌟💖";
-    let i = 0;
-    const speed = 60;
-    const textEl = document.getElementById("text");
+<script>
+/* 🎂 PERSONALIZE HERE */
+const name = "Kim Ngân";
+const birthday = "21/10/2004";
+const message =
+  " Chúc mừng sinh nhật 🎂 Chúc bạn luôn hạnh phúc – mạnh khỏe – bình an – và luôn được yêu thương 💖 ";
 
-    function typeText() {
-      if (i < message.length) {
-        textEl.innerHTML += message.charAt(i);
-        i++;
-        setTimeout(typeText, speed);
-      }
-    }
-    typeText();
+/* 👤 Show info */
+document.getElementById("title").innerText =
+ 🎉 Chúc Mừng Sinh Nhật ${name}`;
+document.getElementById("date").innerText =
+ 🎈 ${birthday}`;
 
-    /* ===== Floating Hearts & Stars ===== */
-    function createFloating(symbol, className) {
-      const el = document.createElement("div");
-      el.className = className;
-      el.innerHTML = symbol;
-      el.style.left = Math.random() * 100 + "vw";
-      el.style.animationDuration = 4 + Math.random() * 4 + "s";
-      document.body.appendChild(el);
+/* 💫 Create rotating text */
+const circle = document.getElementById("circleText");
+const chars = message.split("");
+const angle = 360 / chars.length;
 
-      setTimeout(() => el.remove(), 8000);
-    }
+chars.forEach((char, i) => {
+  const span = document.createElement("span");
+  span.innerText = char;
+  span.style.transform = rotate(${i * angle}deg);
+  circle.appendChild(span);
+});
 
-    setInterval(() => createFloating("💖", "heart"), 600);
-    setInterval(() => createFloating("⭐", "star"), 900);
+/* ✨ Sparkles */
+setInterval(() => {
+  const s = document.createElement("div");
+  s.className = "sparkle";
+  s.innerText = "✨";
+  s.style.left = Math.random() * 100 + "vw";
+  s.style.top = Math.random() * 100 + "vh";
+  s.style.animationDuration = 3 + Math.random() * 3 + "s";
+  document.body.appendChild(s);
 
-    /* ===== Fireworks Effect ===== */
-    const canvas = document.getElementById("fireworks");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  setTimeout(() => s.remove(), 5000);
+}, 250);
+</script>
 
-    let particles = [];
-
-    function random(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    function createFirework(x, y) {
-      for (let i = 0; i < 40; i++) {
-        particles.push({
-          x,
-          y,
-          angle: random(0, Math.PI * 2),
-          speed: random(2, 6),
-          radius: random(1, 3),
-          life: 100,
-        });
-      }
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((p, index) => {
-        p.x += Math.cos(p.angle) * p.speed;
-        p.y += Math.sin(p.angle) * p.speed;
-        p.life--;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.😎";
-        ctx.fill();
-
-        if (p.life <= 0) particles.splice(index, 1);
-      });
-      requestAnimationFrame(animate);
-    }
-
-    setInterval(() => {
-      createFirework(random(100, canvas.width - 100), random(100, canvas.height - 200));
-    }, 800);
-
-    animate();
-
-    window.onresize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-  </script>
 </body>
 </html>
