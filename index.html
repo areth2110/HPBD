@@ -15,7 +15,7 @@
 
 body {
   height: 100vh;
-  background: radial-gradient(circle at top, #ff9a9e, #fad0c4, #fad0c4);
+  background: radial-gradient(circle at top, #ff9a9e, #fad0c4);
   overflow: hidden;
   color: white;
   text-align: center;
@@ -31,15 +31,12 @@ body {
 h1 {
   font-size: 2.8rem;
   margin-bottom: 10px;
-  text-shadow: 0 0 10px rgba(255,255,255,0.8);
 }
 
 p {
   font-size: 1.2rem;
-  opacity: 0.9;
 }
 
-/* 🎂 Cake */
 .cake {
   position: relative;
   margin: 30px auto;
@@ -65,26 +62,20 @@ p {
   left: 50%;
   width: 16px;
   height: 25px;
-  background: radial-gradient(circle, #fff700, #ff8c00, transparent);
+  background: radial-gradient(circle, #fff700, #ff8c00);
   border-radius: 50%;
   transform: translateX(-50%);
   animation: flicker 0.2s infinite;
 }
 
 @keyframes flicker {
-  0% {transform: translateX(-50%) scale(1);}
-  50% {transform: translateX(-50%) scale(0.9);}
-  100% {transform: translateX(-50%) scale(1);}
+  50% { transform: translateX(-50%) scale(0.9); }
 }
 
-/* 💖 Heart */
 .heart-container {
   display: none;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
+  position: fixed;
+  inset: 0;
 }
 
 .heart {
@@ -94,16 +85,12 @@ p {
   font-size: 90px;
   transform: translate(-50%, -50%);
   animation: beat 1s infinite;
-  text-shadow: 0 0 20px rgba(255,255,255,0.8);
 }
 
 @keyframes beat {
-  0% {transform: translate(-50%, -50%) scale(1);}
-  50% {transform: translate(-50%, -50%) scale(1.2);}
-  100% {transform: translate(-50%, -50%) scale(1);}
+  50% { transform: translate(-50%, -50%) scale(1.2); }
 }
 
-/* 💫 Rotating text */
 .circle-text {
   position: absolute;
   top: 50%;
@@ -115,8 +102,7 @@ p {
 }
 
 @keyframes rotate {
-  from {transform: translate(-50%, -50%) rotate(0deg);}
-  to {transform: translate(-50%, -50%) rotate(360deg);}
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 .circle-text span {
@@ -125,10 +111,8 @@ p {
   top: 0;
   transform-origin: 0 150px;
   font-size: 18px;
-  white-space: pre;
 }
 
-/* ✨ Sparkles */
 .sparkle {
   position: absolute;
   font-size: 20px;
@@ -136,17 +120,8 @@ p {
 }
 
 @keyframes float {
-  0% {opacity: 0; transform: translateY(50px);}
-  20% {opacity: 1;}
-  100% {opacity: 0; transform: translateY(-100px);}
-}
-
-footer {
-  position: fixed;
-  bottom: 10px;
-  width: 100%;
-  font-size: 0.9rem;
-  opacity: 0.8;
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 0; transform: translateY(-100px); }
 }
 </style>
 </head>
@@ -163,18 +138,8 @@ footer {
     </div>
   </div>
 
-  <p>👉 Hãy *thổi vào micro* để thổi nến 🎤</p>
-  <button id="startMic"
-  style="margin-top:15px;
-         padding:12px 20px;
-         font-size:16px;
-         border:none;
-         border-radius:25px;
-         background:#ff5e8e;
-         color:white;
-         cursor:pointer;">
-  🎤 Bắt đầu thổi nến
-</button>
+  <p>👉 Nhấn nút & thổi vào micro 🎤</p>
+  <button id="startMic">🎤 Bắt đầu thổi nến</button>
 </div>
 
 <div class="heart-container" id="stage2">
@@ -182,31 +147,21 @@ footer {
   <div class="circle-text" id="circleText"></div>
 </div>
 
-<footer>
-  ✨ Một khoảnh khắc sinh nhật thật đáng nhớ ✨
-</footer>
-
 <script>
-/* 🎁 PERSONAL INFO */
 const name = "Vic Ven";
 const birthday = "04/01/2004";
 const wish = "Chúc mừng sinh nhật 🎂 Luôn hạnh phúc – mạnh khỏe – và được yêu thương 💖 ";
 
-document.getElementById("info").innerText =
- 🎂 ${name} | 🎈 ${birthday}`;
+document.getElementById("info").innerText =🎂 ${name} | 🎈 ${birthday}`;
 
-/* 🎤 MICRO BLOW DETECTION */
 let audioContext, analyser, microphone, dataArray;
 const flame = document.getElementById("flame");
 
-const startBtn = document.getElementById("startMic");
-let audioContext, analyser, microphone, dataArray;
-
-startBtn.addEventListener("click", async () => {
+document.getElementById("startMic").addEventListener("click", async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioContext = new AudioContext();
     analyser = audioContext.createAnalyser();
     microphone = audioContext.createMediaStreamSource(stream);
 
@@ -214,62 +169,47 @@ startBtn.addEventListener("click", async () => {
     analyser.fftSize = 256;
     dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-    startBtn.innerText = "🎂 Đang lắng nghe... hãy thổi!";
-    startBtn.disabled = true;
-
     listen();
-  } catch (err) {
-    alert("Không thể truy cập micro. Vui lòng kiểm tra quyền micro của trình duyệt.");
+  } catch {
+    alert("⚠️ Không truy cập được micro");
   }
-});
-  listen();
 });
 
 function listen() {
   analyser.getByteFrequencyData(dataArray);
-  let volume = dataArray.reduce((a,b) => a + b) / dataArray.length;
-
-  if (volume > 40) {
-    blowOut();
-  } else {
-    requestAnimationFrame(listen);
-  }
+  const volume = dataArray.reduce((a,b)=>a+b)/dataArray.length;
+  if (volume > 40) blowOut();
+  else requestAnimationFrame(listen);
 }
 
-/* 🎂 BLOW OUT */
 function blowOut() {
   flame.style.display = "none";
-  document.getElementById("stage1").style.display = "none";
-  document.getElementById("stage2").style.display = "block";
+  stage1.style.display = "none";
+  stage2.style.display = "block";
   createCircleText();
   sparkle();
 }
 
-/* 💫 ROTATING TEXT */
 function createCircleText() {
   const circle = document.getElementById("circleText");
-  const chars = wish.split("");
-  const angle = 360 / chars.length;
-
-  chars.forEach((char, i) => {
-    const span = document.createElement("span");
-    span.innerText = char;
-    span.style.transform = rotate(${i * angle}deg);
+  [...wish].forEach((c,i)=>{
+    const span=document.createElement("span");
+    span.innerText=c;
+    span.style.transform=`rotate(${i*8}deg)`;
     circle.appendChild(span);
   });
 }
 
-/* ✨ SPARKLES */
 function sparkle() {
-  setInterval(() => {
-    const s = document.createElement("div");
-    s.className = "sparkle";
-    s.innerText = "✨";
-    s.style.left = Math.random() * 100 + "vw";
-    s.style.top = Math.random() * 100 + "vh";
+  setInterval(()=>{
+    const s=document.createElement("div");
+    s.className="sparkle";
+    s.innerText="✨";
+    s.style.left=Math.random()*100+"vw";
+    s.style.top=Math.random()*100+"vh";
     document.body.appendChild(s);
-    setTimeout(() => s.remove(), 4000);
-  }, 300);
+    setTimeout(()=>s.remove(),4000);
+  },300);
 }
 </script>
 
