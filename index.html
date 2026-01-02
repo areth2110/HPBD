@@ -164,6 +164,17 @@ footer {
   </div>
 
   <p>👉 Hãy *thổi vào micro* để thổi nến 🎤</p>
+  <button id="startMic"
+  style="margin-top:15px;
+         padding:12px 20px;
+         font-size:16px;
+         border:none;
+         border-radius:25px;
+         background:#ff5e8e;
+         color:white;
+         cursor:pointer;">
+  🎤 Bắt đầu thổi nến
+</button>
 </div>
 
 <div class="heart-container" id="stage2">
@@ -188,13 +199,29 @@ document.getElementById("info").innerText =
 let audioContext, analyser, microphone, dataArray;
 const flame = document.getElementById("flame");
 
-navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-  audioContext = new AudioContext();
-  analyser = audioContext.createAnalyser();
-  microphone = audioContext.createMediaStreamSource(stream);
-  microphone.connect(analyser);
-  analyser.fftSize = 256;
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
+const startBtn = document.getElementById("startMic");
+let audioContext, analyser, microphone, dataArray;
+
+startBtn.addEventListener("click", async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    microphone = audioContext.createMediaStreamSource(stream);
+
+    microphone.connect(analyser);
+    analyser.fftSize = 256;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    startBtn.innerText = "🎂 Đang lắng nghe... hãy thổi!";
+    startBtn.disabled = true;
+
+    listen();
+  } catch (err) {
+    alert("Không thể truy cập micro. Vui lòng kiểm tra quyền micro của trình duyệt.");
+  }
+});
   listen();
 });
 
