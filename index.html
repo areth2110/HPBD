@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>🎂 Happy Birthday</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: radial-gradient(circle at top, #ff9a9e, #fad0c4, #fad0c4);
+  overflow: hidden;
+  color: white;
+  text-align: center;
+}
+
+.container {
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+h1 {
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* 🎂 Cake */
+.cake {
+  position: relative;
+  margin: 30px auto;
+  width: 200px;
+  height: 140px;
+  background: #ffb6c1;
+  border-radius: 10px;
+}
+
+.candle {
+  position: absolute;
+  width: 10px;
+  height: 40px;
+  background: white;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.flame {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  width: 16px;
+  height: 25px;
+  background: radial-gradient(circle, #fff700, #ff8c00, transparent);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  animation: flicker 0.2s infinite;
+}
+
+@keyframes flicker {
+  0% {transform: translateX(-50%) scale(1);}
+  50% {transform: translateX(-50%) scale(0.9);}
+  100% {transform: translateX(-50%) scale(1);}
+}
+
+/* 💖 Heart */
+.heart-container {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.heart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 90px;
+  transform: translate(-50%, -50%);
+  animation: beat 1s infinite;
+  text-shadow: 0 0 20px rgba(255,255,255,0.8);
+}
+
+@keyframes beat {
+  0% {transform: translate(-50%, -50%) scale(1);}
+  50% {transform: translate(-50%, -50%) scale(1.2);}
+  100% {transform: translate(-50%, -50%) scale(1);}
+}
+
+/* 💫 Rotating text */
+.circle-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  transform: translate(-50%, -50%);
+  animation: rotate 12s linear infinite;
+}
+
+@keyframes rotate {
+  from {transform: translate(-50%, -50%) rotate(0deg);}
+  to {transform: translate(-50%, -50%) rotate(360deg);}
+}
+
+.circle-text span {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform-origin: 0 150px;
+  font-size: 18px;
+  white-space: pre;
+}
+
+/* ✨ Sparkles */
+.sparkle {
+  position: absolute;
+  font-size: 20px;
+  animation: float 4s linear infinite;
+}
+
+@keyframes float {
+  0% {opacity: 0; transform: translateY(50px);}
+  20% {opacity: 1;}
+  100% {opacity: 0; transform: translateY(-100px);}
+}
+
+footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="stage1">
+  <h1>🎉 Chúc Mừng Sinh Nhật</h1>
+  <p id="info"></p>
+
+  <div class="cake">
+    <div class="candle">
+      <div class="flame" id="flame"></div>
+    </div>
+  </div>
+
+  <p>👉 Hãy *thổi vào micro* để thổi nến 🎤</p>
+</div>
+
+<div class="heart-container" id="stage2">
+  <div class="heart">💖</div>
+  <div class="circle-text" id="circleText"></div>
+</div>
+
+<footer>
+  ✨ Một khoảnh khắc sinh nhật thật đáng nhớ ✨
+</footer>
+
+<script>
+/* 🎁 PERSONAL INFO */
+const name = "Vic Ven";
+const birthday = "04/01/2004";
+const wish = "Chúc mừng sinh nhật 🎂 Luôn hạnh phúc – mạnh khỏe – và được yêu thương 💖 ";
+
+document.getElementById("info").innerText =
+ 🎂 ${name} | 🎈 ${birthday}`;
+
+/* 🎤 MICRO BLOW DETECTION */
+let audioContext, analyser, microphone, dataArray;
+const flame = document.getElementById("flame");
+
+navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+  audioContext = new AudioContext();
+  analyser = audioContext.createAnalyser();
+  microphone = audioContext.createMediaStreamSource(stream);
+  microphone.connect(analyser);
+  analyser.fftSize = 256;
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+  listen();
+});
+
+function listen() {
+  analyser.getByteFrequencyData(dataArray);
+  let volume = dataArray.reduce((a,b) => a + b) / dataArray.length;
+
+  if (volume > 40) {
+    blowOut();
+  } else {
+    requestAnimationFrame(listen);
+  }
+}
+
+/* 🎂 BLOW OUT */
+function blowOut() {
+  flame.style.display = "none";
+  document.getElementById("stage1").style.display = "none";
+  document.getElementById("stage2").style.display = "block";
+  createCircleText();
+  sparkle();
+}
+
+/* 💫 ROTATING TEXT */
+function createCircleText() {
+  const circle = document.getElementById("circleText");
+  const chars = wish.split("");
+  const angle = 360 / chars.length;
+
+  chars.forEach((char, i) => {
+    const span = document.createElement("span");
+    span.innerText = char;
+    span.style.transform = rotate(${i * angle}deg);
+    circle.appendChild(span);
+  });
+}
+
+/* ✨ SPARKLES */
+function sparkle() {
+  setInterval(() => {
+    const s = document.createElement("div");
+    s.className = "sparkle";
+    s.innerText = "✨";
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.top = Math.random() * 100 + "vh";
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 4000);
+  }, 300);
+}
+</script>
+
+</body>
+</html>
