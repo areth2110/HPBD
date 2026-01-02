@@ -2,16 +2,15 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>💖 Heart Particle Animation</title>
+<title>💖 Heart Particle 3D</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: radial-gradient(circle at top, #050505, #000000);
-    overflow: hidden;
-  }
 
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at top, #050505, #000000);
+  }
   canvas {
     display: block;
   }
@@ -19,111 +18,142 @@
 </head>
 
 <body>
-<canvas id="canvas"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+/* ================= SCENE ================= */
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x000000, 50, 300);
 
-const cx = canvas.width / 2;
-const cy = canvas.height / 2 - 80;
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.z = 180;
 
-/* 🌸 Heart formula */
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+document.body.appendChild(renderer.domElement);
+
+/* ================= LIGHT ================= */
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+const light = new THREE.PointLight(0xff88aa, 1.2, 500);
+light.position.set(0, 80, 120);
+scene.add(light);
+
+/* ================= HEART FORMULA ================= */
 function heart(t) {
-  return {
-    x: 16 * Math.pow(Math.sin(t), 3),
-    y: -(13 * Math.cos(t)
-       - 5 * Math.cos(2 * t)
-       - 2 * Math.cos(3 * t)
-       - Math.cos(4 * t))
-  };
+  return new THREE.Vector3(
+    16 * Math.pow(Math.sin(t), 3),
+    13 * Math.cos(t)
+      - 5 * Math.cos(2 * t)
+      - 2 * Math.cos(3 * t)
+      - Math.cos(4 * t),
+    0
+  );
 }
 
-/* 💖 Heart particles */
-let particles = [];
-const TOTAL = 2200;
+/* ================= PARTICLES ================= */
+const COUNT = 7000;
+const geometry = new THREE.BufferGeometry();
+const positions = new Float32Array(COUNT * 3);
+const colors = new Float32Array(COUNT * 3);
 
-for (let i = 0; i < TOTAL; i++) {
+for (let i = 0; i < COUNT; i++) {
   const t = Math.random() * Math.PI * 2;
   const h = heart(t);
+  const depth = (Math.random() - 0.5) * 20;
 
-  particles.push({
-    angle: t,
-    x: h.x,
-    y: h.y,
-    z: Math.random() * 30,
-    size: Math.random() * 1.8 + 0.5,
-    speed: Math.random() * 0.02 + 0.01
-  });
+  positions[i * 3]     = h.x * 3 + Math.random() * 2;
+  positions[i * 3 + 1] = h.y * 3 + Math.random() * 2;
+  positions[i * 3 + 2] = depth;
+
+  colors[i * 3]     = 1.0;
+  colors[i * 3 + 1] = 0.5 + Math.random() * 0.2;
+  colors[i * 3 + 2] = 0.7 + Math.random() * 0.2;
 }
 
-/* 💫 Rotating text */
-const text = "Chúc mừng sinh nhật  •  Luôn hạnh phúc  •  Bình an  •  Được yêu thương  •  ";
-let textAngle = 0;
+geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
-/* 🎬 Animation */
+const material = new THREE.PointsMaterial({
+  size: 1.6,
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.85,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const heartParticles = new THREE.Points(geometry, material);
+scene.add(heartParticles);
+
+/* ================= ROTATING TEXT ================= */
+const text = "Chúc mừng sinh nhật • Luôn hạnh phúc • Bình an • Được yêu thương • ";
+const textGroup = new THREE.Group();
+
+for (let i = 0; i < text.length; i++) {
+  const canvasTxt = document.createElement("canvas");
+  canvasTxt.width = 256;
+  canvasTxt.height = 256;
+  const ctx = canvasTxt.getContext("2d");
+
+  ctx.fillStyle = "white";
+  ctx.font = "32px Segoe UI";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text[i], 128, 128);
+
+  const texture = new THREE.CanvasTexture(canvasTxt);
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: texture, transparent: true })
+  );
+
+  const angle = (i / text.length) * Math.PI * 2;
+  sprite.position.set(
+    Math.cos(angle) * 60,
+    -70,
+    Math.sin(angle) * 60
+  );
+
+  sprite.scale.set(8, 8, 1);
+  textGroup.add(sprite);
+}
+
+scene.add(textGroup);
+
+/* ================= ANIMATION ================= */
+let time = 0;
+
 function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  /* ⭐ Background stars */
-  for (let i = 0; i < 60; i++) {
-    ctx.fillStyle = "rgba(255,255,255,0.15)";
-    ctx.fillRect(
-      Math.random() * canvas.width,
-      Math.random() * canvas.height,
-      1,
-      1
-    );
-  }
-
-  /* 💖 Heart */
-  particles.forEach(p => {
-    p.angle += p.speed;
-    const h = heart(p.angle);
-
-    const scale = 10;
-    const x = cx + h.x * scale + Math.sin(Date.now() * 0.002 + p.z) * 2;
-    const y = cy + h.y * scale + Math.cos(Date.now() * 0.002 + p.z) * 2;
-
-    ctx.beginPath();
-    ctx.arc(x, y, p.size, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255,120,160,0.85)";
-    ctx.fill();
-  });
-
-  /* 🔄 Circular rotating text */
-  const radius = 140;
-  textAngle += 0.002;
-
-  ctx.save();
-  ctx.translate(cx, cy + 160);
-  ctx.rotate(textAngle);
-
-  for (let i = 0; i < text.length; i++) {
-    const angle = (i / text.length) * Math.PI * 2;
-    ctx.save();
-    ctx.rotate(angle);
-    ctx.translate(0, -radius);
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
-    ctx.font = "16px Segoe UI";
-    ctx.fillText(text[i], 0, 0);
-    ctx.restore();
-  }
-
-  ctx.restore();
-
   requestAnimationFrame(animate);
+  time += 0.01;
+
+  const pulse = 1 + Math.sin(time * 2) * 0.04;
+  heartParticles.scale.set(pulse, pulse, pulse);
+
+  heartParticles.rotation.y += 0.002;
+  heartParticles.rotation.x = Math.sin(time) * 0.05;
+
+  textGroup.rotation.y -= 0.003;
+
+  renderer.render(scene, camera);
 }
 
 animate();
 
-/* 📱 Resize */
+/* ================= RESIZE ================= */
 window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
 </script>
+
 </body>
 </html>
